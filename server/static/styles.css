@@ -1,0 +1,30 @@
+body {
+    background-color: #232326;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+}
+
+/* canvas {
+    outline: none;
+    display: block;
+    aspect-ratio: 16 / 9;
+    /* width: 80vw;  50% of viewport width
+    /* height: 80vh;  50% of viewport height
+    position: relative;
+} */
+
+.aspect-ratio-container {
+    width: 90vw; /* Set width as per your requirements */
+    aspect-ratio: 16 / 9; /* Maintain a 16:9 aspect ratio */
+    /*overflow: hidden;  Prevent overflow */
+}
+
+#draupnir {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    /*object-fit: contain; Ensure the canvas content fits inside while preserving aspect ratio */
+}
