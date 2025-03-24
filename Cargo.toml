@@ -1,0 +1,30 @@
+[package]
+name = "draupnir"
+version = "0.1.0"
+edition = "2024"
+
+[profile.wasm-release]
+inherits = "release"
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+
+[profile.fast]
+inherits = "dev"
+opt-level = 0        # No optimizations (fastest compilation)
+debug = false        # Disable debug info (optional, speeds up linking)
+lto = "off"          # No Link Time Optimization (LTO slows down compilation)
+codegen-units = 256  # Maximum parallel compilation
+incremental = true   # Enable incremental compilation
+panic = "abort"      # Avoids generating unwinding code (reduces compile time)
+
+[profile.desktop_release]
+inherits = "release"
+opt-level = 3       # Maximum performance optimizations
+lto = "fat"         # Full Link-Time Optimization (LTO)
+codegen-units = 1   # Better optimizations (slower compile time)
+panic = "abort"     # Removes panic-unwind code, reducing size
+strip = true        # Strips debug symbols (reduces size)
+
+[dependencies]
+bevy = "0.15"
