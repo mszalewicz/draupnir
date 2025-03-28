@@ -1,53 +1,77 @@
 //! This example shows various ways to configure texture materials in 3D.
 
-use std::f32::consts::PI;
+mod cameras;
 
-use bevy::prelude::*;
+use std::f32::consts::PI;
+use std::time::Duration;
+
+use bevy::{
+    dev_tools::fps_overlay::{FpsOverlayConfig, FpsOverlayPlugin},
+    prelude::*,
+    text::FontSmoothing,
+    // window::*,
+    winit::*,
+};
+
+// static mut scaleFactor: f32 = 0. ;
+
+struct OverlayColor;
+
+impl OverlayColor {
+    const WHITE: Color = Color::srgb(1.0, 1.0, 1.0);
+}
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                // Tells Wasm to resize the window according to the available canvas
-                fit_canvas_to_parent: true,
-                // provide the ID selector string here
-                canvas: Some("#draupnir".into()),
-                // ... any other window properties ...
+        .add_plugins((
+            DefaultPlugins.set(WindowPlugin {
+                primary_window: Some(Window {
+                    // Tells Wasm to resize the window according to the available canvas
+                    fit_canvas_to_parent: true,
+                    // provide the ID selector string here
+                    canvas: Some("#draupnir".into()),
+                    // ... any other window properties ...
+                    ..default()
+                }),
                 ..default()
             }),
-            ..default()
-        }))
-        .add_systems(Startup, setup)
-        .add_systems(Update, rotate_over_time)
+            FpsOverlayPlugin {
+                config: FpsOverlayConfig {
+                    text_config: TextFont {
+                        // Here we define size of our overlay
+                        font_size: 35.0,
+                        // If we want, we can use a custom font
+                        font: default(),
+                        // We could also disable font smoothing,
+                        font_smoothing: FontSmoothing::default(),
+                    },
+                    // We can also change color of the overlay
+                    text_color: OverlayColor::WHITE,
+                    enabled: true,
+                },
+            },
+        ))
+        .add_systems(Startup, (setup, init_refresh_rate, cameras::setup_camera))
+        .add_systems(Update, (rotate_over_time, cameras::fit_canvas))
+        // .add_systems(Update, update_resolution)
         .run();
 }
 
-// fn main() {
-//     let mut app = App::new();
-//     app.add_plugins(DefaultPlugins.set(WindowPlugin {
-//         primary_window: Some(Window {
-//             // provide the ID selector string here
-//             canvas: Some("#mygame-canvas".into()),
-//             // ... any other window properties ...
-//             ..default()
-//         }),
-//         ..default()
-//     }));
-//     // ...
-//     app.run();
-// }
+fn init_refresh_rate(mut winit: ResMut<WinitSettings>) {
+    winit.focused_mode = UpdateMode::reactive(Duration::from_secs_f32(1.0 / 60.0));
+}
 
 #[derive(Component)]
 struct RotatingEntity;
 
 fn rotate_over_time(time: Res<Time>, mut query: Query<&mut Transform, With<RotatingEntity>>) {
     for mut transform in query.iter_mut() {
-        transform.rotate_z(0.5 * time.delta_secs());
+        transform.rotate_z(0.6 * time.delta_secs());
         // transform.rotate_x(0.8 * time.delta_secs());
     }
 }
 
-/// sets up a scene with textured entities
+// sets up a scene with textured entities
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -89,32 +113,34 @@ fn setup(
     });
 
     // textured quad - normal
-    commands
-        .spawn((
+    commands.spawn((
             Mesh3d(quad_handle.clone()),
             MeshMaterial3d(material_handle),
             Transform::from_xyz(0.0, 0.0, 1.5).with_rotation(Quat::from_rotation_x(-PI / 5.0)),
+            cameras::PIXEL_PERFECT_LAYERS,
         ))
         .insert(RotatingEntity);
     // textured quad - modulated
-    commands
-        .spawn((
+    commands.spawn((
             Mesh3d(quad_handle.clone()),
             MeshMaterial3d(red_material_handle),
             Transform::from_rotation(Quat::from_rotation_x(-PI / 5.0)),
+            cameras::PIXEL_PERFECT_LAYERS,
         ))
         .insert(RotatingEntity);
     // textured quad - modulated
-    commands
-        .spawn((
+    commands.spawn((
             Mesh3d(quad_handle),
             MeshMaterial3d(blue_material_handle),
             Transform::from_xyz(0.0, 0.0, -1.5).with_rotation(Quat::from_rotation_x(-PI / 5.0)),
+            cameras::PIXEL_PERFECT_LAYERS,
         ))
         .insert(RotatingEntity);
     // camera
-    commands.spawn((
-        Camera3d::default(),
-        Transform::from_xyz(3.0, 5.0, 8.0).looking_at(Vec3::ZERO, Vec3::Y),
-    ));
+    // commands.spawn((
+    //     Camera3d::default(),
+    //     Transform::from_xyz(3.0, 5.0, 8.0).looking_at(Vec3::ZERO, Vec3::Y),
+    // ));
 }
+
+

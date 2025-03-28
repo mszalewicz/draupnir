@@ -3,11 +3,19 @@ name = "draupnir"
 version = "0.1.0"
 edition = "2024"
 
-[profile.wasm-release]
+[profile.wasm_wgpu-release]
 inherits = "release"
 opt-level = "z"
 lto = "fat"
 codegen-units = 1
+
+[profile.wasm_webgl2-release]
+inherits = "release"
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+
+
 
 [profile.fast]
 inherits = "dev"
@@ -27,4 +35,4 @@ panic = "abort"     # Removes panic-unwind code, reducing size
 strip = true        # Strips debug symbols (reduces size)
 
 [dependencies]
-bevy = "0.15"
+bevy = { version = "0.15", features = ["webgpu", "bevy_dev_tools"]}

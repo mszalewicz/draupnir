@@ -1,2 +1,10 @@
 /target
+/vendor
+/.cargo
+.swp
+*.js
+*.wasm
+*.wasm.br
+server_bin
+
 .DS_Store

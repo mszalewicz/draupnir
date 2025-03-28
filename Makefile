@@ -4,10 +4,9 @@ run_wasm_wgpu: build_wasm_wgpu
 	@echo "Building server"
 	@cd server && go build -ldflags="-s -w" .
 	@echo "Running server"
-	@cd server && ./server
+	@cd server && ./server_bin
 
-
-build_wasm:
+build_wasm_wgpu:
 	@echo "Building WASM"
 	@BACKEND=webgpu cargo build --profile wasm_wgpu-release --target wasm32-unknown-unknown
 	@echo "Binding WASM"
@@ -26,10 +25,10 @@ run_wasm_webgl: build_wasm_webgl
 	@echo "Building server"
 	@cd server && go build -ldflags="-s -w" .
 	@echo "Running server"
-	@cd server && ./server
-
+	@cd server && ./server_bin
 
 build_wasm_webgl:
+	@echo "WebGL2:"
 	@echo "Building WASM"
 	@BACKEND=webgl2 cargo build --profile wasm_webgl2-release --target wasm32-unknown-unknown
 	@echo "Binding WASM"
@@ -44,9 +43,11 @@ build_wasm_webgl:
 	@cp target/wasm32-unknown-unknown/wasm_webgl2-release/draupnir_bg.wasm.br server/static
 	@cp target/wasm32-unknown-unknown/wasm_webgl2-release/draupnir.js server/static
 
-
 build_fast:
 	cargo build --profile fast --target aarch64-apple-darwin
+
+build_desktop_release:
+	cargo build --profile release --target aarch64-apple-darwin
 
 build_release:
 	cargo build --profile desktop_release --target aarch64-apple-darwin
